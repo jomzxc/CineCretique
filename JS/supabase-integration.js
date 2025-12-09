@@ -15,13 +15,41 @@ function setLoadingState(loading) {
   }
 }
 
+// Validate Supabase configuration
+function isSupabaseConfigured() {
+  // Check if values are not placeholders
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+    return false;
+  }
+  
+  // Validate URL format
+  try {
+    const url = new URL(SUPABASE_URL);
+    if (!url.hostname.includes('supabase')) {
+      console.warn('⚠️  SUPABASE_URL does not appear to be a valid Supabase URL');
+      return false;
+    }
+  } catch (e) {
+    console.error('❌ Invalid SUPABASE_URL format');
+    return false;
+  }
+  
+  // Validate key format (Supabase keys are JWT-like and start with 'eyJ')
+  if (!SUPABASE_ANON_KEY.startsWith('eyJ')) {
+    console.warn('⚠️  SUPABASE_ANON_KEY does not appear to be a valid Supabase key');
+    return false;
+  }
+  
+  return true;
+}
+
 // Initialize Supabase on page load
 document.addEventListener('DOMContentLoaded', async () => {
   try {
     supabase = initSupabase();
     
     // Check if Supabase is configured
-    if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+    if (isSupabaseConfigured()) {
       useSupabase = true;
       console.log('✅ Supabase integration enabled - Database mode active');
       
@@ -163,8 +191,11 @@ function overrideWithSupabaseFunctions() {
     const pass = authPass.value.trim();
     
     // Check for admin login (fallback to localStorage mode for admin)
+    // ⚠️ WARNING: Hardcoded admin credentials are for development only
+    // In production, implement proper role-based access control via Supabase
     if ((username === 'admin' || email === 'admin') && pass === 'pass123') {
-      console.log('Admin login detected - using localStorage mode for this session');
+      console.log('⚠️  Admin login detected - using localStorage mode for this session');
+      console.log('ℹ️  For production, implement proper RBAC via Supabase Auth');
       return originalSignInBtn();
     }
     

@@ -1,5 +1,13 @@
 // Supabase Configuration
-// Replace these with your actual Supabase project credentials
+// ⚠️ IMPORTANT: Replace these with your actual Supabase project credentials
+// Get these from: Supabase Dashboard > Settings > API
+// 
+// SUPABASE_URL format: https://xxxxxxxxxxxxx.supabase.co
+// SUPABASE_ANON_KEY format: eyJhbGc... (long JWT-like string)
+//
+// ⚠️ SECURITY: This file is excluded from git (.gitignore)
+// Never commit real credentials to version control!
+
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 

@@ -1,8 +1,15 @@
 // Supabase Configuration Example
-// Copy this file to supabase-config.js and replace with your actual credentials
+// ⚠️ SETUP INSTRUCTIONS:
+// 1. Copy this file to: supabase-config.js
+// 2. Replace YOUR_SUPABASE_URL with your actual Supabase project URL
+// 3. Replace YOUR_SUPABASE_ANON_KEY with your actual anon key
+// 4. Get credentials from: Supabase Dashboard > Settings > API
+//
+// ⚠️ SECURITY: Never commit supabase-config.js to version control!
+// The .gitignore file excludes it automatically.
 
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // e.g., 'https://xxxxxxxxxxxxx.supabase.co'
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // Your anon/public key from Supabase
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // Your anon/public key from Supabase (starts with 'eyJ')
 
 // Initialize Supabase client
 let supabase;

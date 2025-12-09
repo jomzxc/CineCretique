@@ -107,12 +107,35 @@ INSERT INTO movies (title, year, genre, description, poster, trailer_url, is_fea
 - Check the SQL Editor for any error messages
 - Verify RLS policies are enabled
 
+## Admin Account Management
+
+### LocalStorage Mode
+The default admin credentials are:
+- Username: `admin`
+- Password: `pass123`
+
+**⚠️ SECURITY WARNING**: These hardcoded credentials are for development/demo purposes only!
+
+### Supabase Mode (Recommended)
+For production use with Supabase:
+
+1. Create an admin user through normal sign-up
+2. In Supabase dashboard, go to your `profiles` table
+3. Create a custom `role` column: `ALTER TABLE profiles ADD COLUMN role TEXT DEFAULT 'user';`
+4. Set the admin user's role: `UPDATE profiles SET role = 'admin' WHERE username = 'your_admin_username';`
+5. Update RLS policies to check the `role` column for admin actions
+
+**Better approach**: Use Supabase's built-in Auth policies and custom claims for role-based access control.
+
 ## Security Notes
 
 - Never commit your Supabase credentials to version control
 - The anon key is safe to use in client-side code (it's protected by RLS)
-- For production, consider setting up additional security measures
+- Change default admin password immediately in production
+- For production, implement proper role-based access control through Supabase Auth
 - Use environment variables for sensitive configuration
+- Consider implementing API rate limiting
+- Enable email confirmation for new sign-ups in production
 
 ## Additional Resources
 

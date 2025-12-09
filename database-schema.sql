@@ -225,11 +225,25 @@ CREATE TRIGGER update_reviews_updated_at BEFORE UPDATE ON reviews
 -- Function to handle new user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  generated_username TEXT;
 BEGIN
+  -- Generate a unique username if not provided
+  -- Uses email prefix or UUID with timestamp to avoid collisions
+  IF NEW.raw_user_meta_data->>'username' IS NOT NULL THEN
+    generated_username := NEW.raw_user_meta_data->>'username';
+  ELSIF NEW.email IS NOT NULL THEN
+    -- Use email prefix
+    generated_username := split_part(NEW.email, '@', 1) || '_' || substr(NEW.id::text, 1, 8);
+  ELSE
+    -- Fallback to UUID-based username
+    generated_username := 'user_' || replace(substr(NEW.id::text, 1, 13), '-', '');
+  END IF;
+  
   INSERT INTO public.profiles (id, username, pfp)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'username', 'user_' || substr(NEW.id::text, 1, 8)),
+    generated_username,
     COALESCE(NEW.raw_user_meta_data->>'pfp', 'SOURCE/Image/l1.png')
   );
   RETURN NEW;
