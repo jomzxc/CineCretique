@@ -280,6 +280,7 @@
           <button type="button" id="closeAuthSignUp" class="close auth-close">✕</button>
           <h3>Create Account</h3>
 
+          <input id="signUpEmail" type="email" placeholder="Email" required />
           <input id="signUpUser" type="text" placeholder="Username" required />
           <input id="signUpPass" type="password" placeholder="Password" required />
           <input id="signUpPfp" type="text" placeholder="Profile Picture URL" required />
@@ -294,7 +295,8 @@
           <button type="button" id="closeAuthSignIn" class="close auth-close">✕</button>
           <h3>Log In</h3>
 
-          <input id="authUser" type="text" placeholder="Username" required />
+          <input id="authEmail" type="email" placeholder="Email" required />
+          <input id="authUser" type="text" placeholder="Username (optional)" />
           <input id="authPass" type="password" placeholder="Password" required />
 
           <button id="signInBtn" class="btn btn-red">Log In</button>
@@ -416,7 +418,17 @@
     <p>© CineCriteque   ||   BSIT NA-3A 2025</p>
   </footer>
 
+  <!-- Supabase Client Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Supabase Configuration -->
+  <script src="supabase-config.js"></script>
+  
+  <!-- Main Application -->
   <script src="JS/game.js"></script>
+  
+  <!-- Supabase Integration -->
+  <script src="JS/supabase-integration.js"></script>
 </body>
 
 </html>
