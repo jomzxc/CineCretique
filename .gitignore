@@ -6,6 +6,9 @@ node_modules/
 .env.local
 .env.production
 
+# Supabase configuration (contains sensitive keys)
+supabase-config.js
+
 # Supabase local development
 .supabase/
 

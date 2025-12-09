@@ -4,6 +4,16 @@
 // Global state
 let useSupabase = false;
 let currentUserProfile = null;
+let isLoadingData = false;
+
+// Helper function to show loading state
+function setLoadingState(loading) {
+  isLoadingData = loading;
+  const moviesGrid = document.getElementById('moviesGrid');
+  if (loading && moviesGrid) {
+    moviesGrid.innerHTML = '<p style="text-align: center; padding: 40px; color: #888;">Loading movies...</p>';
+  }
+}
 
 // Initialize Supabase on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -13,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check if Supabase is configured
     if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
       useSupabase = true;
-      console.log('Supabase integration enabled');
+      console.log('✅ Supabase integration enabled - Database mode active');
       
       // Check for existing session
       const session = await auth.getSession();
@@ -33,7 +43,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Override default functions with Supabase versions
       overrideWithSupabaseFunctions();
     } else {
-      console.log('Supabase not configured, using localStorage');
+      console.log('⚠️  Supabase not configured - Using localStorage mode');
+      console.log('ℹ️  To enable database features, follow instructions in SUPABASE_SETUP.md');
       useSupabase = false;
     }
   } catch (error) {
@@ -50,17 +61,25 @@ async function handleAuthStateChanged(user) {
     currentUserProfile = await db.getUserProfile(user.id);
     currentUser = currentUserProfile.username;
     
+    // Store in localStorage for compatibility
+    localStorage.setItem('currentUser', currentUser);
+    
     // Update UI
     updateButtons();
     await loadSupabaseData();
   } catch (error) {
     console.error('Error loading user profile:', error);
+    // Fallback to localStorage mode if profile loading fails
+    currentUserProfile = null;
+    currentUser = null;
+    localStorage.removeItem('currentUser');
   }
 }
 
 function handleSignOut() {
   currentUser = null;
   currentUserProfile = null;
+  localStorage.removeItem('currentUser');
   updateButtons();
   renderMovies();
   renderFeaturedMovies();
@@ -70,6 +89,10 @@ function handleSignOut() {
 }
 
 async function loadSupabaseData() {
+  if (isLoadingData) return;
+  
+  setLoadingState(true);
+  
   try {
     // Load movies from Supabase
     const movies = await db.getMovies();
@@ -113,7 +136,9 @@ async function loadSupabaseData() {
     renderRecommendations();
   } catch (error) {
     console.error('Error loading Supabase data:', error);
-    showAlert('Error', 'Failed to load data from database');
+    showAlert('Error', 'Failed to load data from database. Check console for details.');
+  } finally {
+    setLoadingState(false);
   }
 }
 
@@ -132,11 +157,19 @@ function overrideWithSupabaseFunctions() {
   // Override sign in
   signInBtn.onclick = async () => {
     const emailField = document.getElementById('authEmail');
+    const usernameField = document.getElementById('authUser');
     const email = emailField ? emailField.value.trim() : '';
+    const username = usernameField ? usernameField.value.trim() : '';
     const pass = authPass.value.trim();
     
+    // Check for admin login (fallback to localStorage mode for admin)
+    if ((username === 'admin' || email === 'admin') && pass === 'pass123') {
+      console.log('Admin login detected - using localStorage mode for this session');
+      return originalSignInBtn();
+    }
+    
     if (!email || !pass) {
-      return showAlert('Error', 'Please fill all fields.');
+      return showAlert('Error', 'Please fill email and password fields.');
     }
     
     try {
